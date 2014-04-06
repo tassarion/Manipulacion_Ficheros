@@ -1,18 +1,23 @@
 package com.manu.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.XPath;
 import org.dom4j.io.SAXReader;
+import org.dom4j.xpath.DefaultXPath;
+import org.jaxen.SimpleNamespaceContext;
+
+
+
+
 
 /**
  * Esta clase sirve para cargar, crear y manipular un documento XML.
@@ -52,6 +57,8 @@ public class XMLDom4j {
 			e.printStackTrace();
 		}
 	}
+	
+	
 	
 	/**
 	 * Este método se emplea para cargar y recorrer en profundidad un fichero XML. 
@@ -95,6 +102,23 @@ public class XMLDom4j {
 		
 	}	
 	
+	
+	/**
+	 * Recorrido en profundidad de un arbol XML
+	 */
+	public void recorrerXMLSaxProf(){
+		lista_etiquetas = new ArrayList<String>();
+		ocurrencias_etiquetas = new ArrayList<Integer>();
+
+		Element rootElement = this.documento.getRootElement();
+		
+		System.out.println("Root Element: "+rootElement.getName());
+		
+		recorrerXMLSax(rootElement);
+		
+		System.out.println("Total etiquetas diferentes encontradas: " + lista_etiquetas.size());
+		
+	}
 	
 	/**
 	 * Método privado recursivo empleado por el recorrido en profundidad
@@ -188,16 +212,17 @@ public class XMLDom4j {
 		nodoPadre.add(nodoHijo);
 	}
 	
-	
-	public List<Node> buscaEtiqueta(String nombreEtiqueta){
-//		System.out.println("Nodo raiz----->"+this.documento.getRootElement().getName());
-//		String xpath = "/"+this.documento.getRootElement().getName()+"/"+nombreEtiqueta;
-		XPath xpath = this.documento.createXPath("/"+this.documento.getRootElement().getName()+"/"+nombreEtiqueta);
-		
-		//List<Node> nodes = xpath.selectNodes(this.documento);
-		//return (List) this.documento.selectNodes(xpath);
-		return xpath.selectNodes(this.documento);
-
+	/**
+	 * Devuelve los nodos (elementos) con un nombre de etiqueta dado
+	 * @param nombreEtiqueta nodo (elementos) a buscar
+	 * @return lista de nodos (elementos)
+	 */
+	public List<Element> buscaEtiqueta(String nombreEtiqueta){
+		HashMap map = new HashMap();
+		map.put( "pre", "urn:iso:std:iso:20022:tech:xsd:pain.001.001.03");		
+		XPath xpath = new DefaultXPath( "//pre:"+nombreEtiqueta);
+		xpath.setNamespaceContext( new SimpleNamespaceContext(map));	
+		return xpath.selectNodes(this.documento);      
 	}
 
 	//Accesores	
